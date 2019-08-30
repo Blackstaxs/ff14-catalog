@@ -158,8 +158,10 @@ def restaurantMenu(job_id):
 @app.route('/')
 @app.route('/hello')
 def HelloWorld():
-    
-    return render_template('index.html')
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
+    login_session['state'] = state
+    return render_template('index.html', STATE=state)
 
 @app.route('/all')
 def testhello():

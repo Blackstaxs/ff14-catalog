@@ -1,5 +1,32 @@
 <html>
 <head>
+<style>
+/* Style the body */
+body {
+  font-family: Arial;
+  margin: 0;
+}
+
+.button {
+  background-color: #16718E;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  position: absolute;
+  top: 8px;
+  right: 16px;
+}
+
+
+
+
+</style>
   <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
@@ -15,7 +42,7 @@
 <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 </head>
 <body>  
-<button id="signinButton">Google Signin</button>
+<button id="signinButton" class="button">Login</button>
 <div id="result"></div>
           
 <script>
