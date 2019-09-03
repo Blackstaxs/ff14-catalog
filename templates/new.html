@@ -20,7 +20,7 @@ body {
   text-justify: inter-word;
 }
 
-.button {
+.button1 {
   background-color: #16718E;
   border: none;
   color: white;
@@ -51,11 +51,11 @@ body {
 <form action= "{{url_for('newAbility', job_id = job_id)}}" method = 'POST'>
 
 <p>Ability:</p>
-<input type = 'text' size='30' name = 'name' placeholder = 'name'>
-<input type = 'text' size='30' name = 'Cast' placeholder = 'Cast'>
-<input type = 'text' size='30' name = 'level' placeholder = 'level'>
-<input type = 'text' size='30' name = 'description' placeholder = 'description'>
-<input type='submit' value='New' class="button">
+<input type = 'text' size='30' name = 'name' placeholder = 'name' required minlength="2" maxlength="30">
+<input type = 'text' size='30' name = 'Cast' placeholder = 'Spell/Ability/Weaponskill' required pattern="[Ss]pell|[Aa]bility|[Ww]eaponskill">
+<input type = 'number' size='30' name = 'level' placeholder = 'level' value="1" min="1" max="80">
+<input type = 'text' size='30' name = 'description' placeholder = 'description' required minlength="10" maxlength="200">
+<input type='submit' value='New' class="button1">
 </form>
 <a href= '/'>Cancel</a>
 </div>

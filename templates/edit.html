@@ -20,7 +20,7 @@ body {
   text-justify: inter-word;
 }
 
-.button {
+.button1 {
   background-color: #16718E;
   border: none;
   color: white;
@@ -51,10 +51,10 @@ body {
 <form action= "{{url_for('editAbility', job_id = job_id, ability_id=item.id)}}" method = 'POST'>
 
 <p>Ability:</p>
-<input type = 'text' size='30' name = 'name' placeholder = '{{item.name}}'>
-<input type = 'text' size='30' name = 'level' placeholder = '{{item.level}}'>
-<input type = 'text' size='30' name = 'description' placeholder = '{{item.description}}'>
-<input type='submit' value='Edit' class="button">
+<input type = 'text' size='30' name = 'name' placeholder = '{{item.name}}' required minlength="2" maxlength="30">
+<input type = 'number' size='30' name = 'level' placeholder = '{{item.level}}' value="1" min="1" max="80">
+<input type = 'text' size='30' name = 'description' placeholder = '{{item.description}}' required minlength="10" maxlength="200">
+<input type='submit' value='Edit' class="button1">
 </form>
 <a href= '/'>Cancel</a>
 </div>
