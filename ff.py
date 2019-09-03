@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
-app = Flask(__name__)
 
 from flask import session as login_session
-import random, string
+import random
+import string
 
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -30,6 +30,7 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -111,6 +112,7 @@ def gconnect():
     print "done!"
     return output
 
+
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
@@ -141,6 +143,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+
 @app.route('/jobs/<int:job_id>/')
 def restaurantMenu(job_id):
     login = 0
@@ -148,7 +151,8 @@ def restaurantMenu(job_id):
         login = 1
     job = session.query(Job).filter_by(id=job_id).one()
     items = session.query(Ability).filter_by(job_id=job.id)
-    return render_template('class.html', job=job, items = items, login=login)
+    return render_template('class.html', job=job, items=items, login=login)
+
 
 @app.route('/')
 @app.route('/hello')
@@ -157,6 +161,7 @@ def HelloWorld():
                     for x in xrange(32))
     login_session['state'] = state
     return render_template('index.html', STATE=state)
+
 
 @app.route('/all')
 def testhello():
@@ -174,6 +179,7 @@ def testhello():
         output += '</br>'
     return output
 
+
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
@@ -181,29 +187,33 @@ def showLogin():
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
+
 @app.route('/healer')
 def test1():
     login = 0
     if 'username' in login_session:
         login = 1
-    job1 = session.query(Job).filter_by(role = 'Healer')
+    job1 = session.query(Job).filter_by(role='Healer')
     return render_template('classes.html', job=job1, login=login)
+
 
 @app.route('/tank')
 def test2():
     login = 0
     if 'username' in login_session:
         login = 1
-    job2 = session.query(Job).filter_by(role = 'Tank')
+    job2 = session.query(Job).filter_by(role='Tank')
     return render_template('classes.html', job=job2, login=login)
-   
+
+
 @app.route('/dps')
 def test3():
     login = 0
     if 'username' in login_session:
         login = 1
-    job3 = session.query(Job).filter_by(role = 'Dps')
+    job3 = session.query(Job).filter_by(role='Dps')
     return render_template('classes.html', job=job3, login=login)
+
 
 @app.route('/jobs/<int:job_id>/delete',
            methods=['GET', 'POST'])
@@ -216,10 +226,12 @@ def deleteJob(job_id):
     else:
         return render_template('delete.html', item=jobToDelete)
 
+
 @app.route('/JSON')
 def ffJSON():
     jobs = session.query(Job).all()
     return jsonify(ffItems=[i.serialize for i in jobs])
+
 
 @app.route('/jobs/<int:job_id>/ability/JSON')
 def ffAbilityJSON(job_id):
@@ -228,14 +240,18 @@ def ffAbilityJSON(job_id):
         job_id=job_id).all()
     return jsonify(ffItems=[i.serialize for i in items])
 
+
 @app.route('/jobs/<int:job_id>/ability/<int:ability_id>/JSON')
 def abilityJSON(job_id, ability_id):
     ability = session.query(Ability).filter_by(id=ability_id).one()
     return jsonify(Ability=ability.serialize)
 
+
 @app.route('/jobs/<int:job_id>/<int:ability_id>/edit',
            methods=['GET', 'POST'])
 def editAbility(job_id, ability_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     editedAbility = session.query(Ability).filter_by(id=ability_id).one()
     if request.method == 'POST':
         if request.form['name']:
