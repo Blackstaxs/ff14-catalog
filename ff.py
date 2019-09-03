@@ -96,13 +96,10 @@ def gconnect():
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-
     data = answer.json()
-
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -144,7 +141,6 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-
 @app.route('/jobs/<int:job_id>/')
 def restaurantMenu(job_id):
     login = 0
@@ -153,7 +149,6 @@ def restaurantMenu(job_id):
     job = session.query(Job).filter_by(id=job_id).one()
     items = session.query(Ability).filter_by(job_id=job.id)
     return render_template('class.html', job=job, items = items, login=login)
-
 
 @app.route('/')
 @app.route('/hello')
@@ -210,14 +205,10 @@ def test3():
     job3 = session.query(Job).filter_by(role = 'Dps')
     return render_template('classes.html', job=job3, login=login)
 
-
-
-
 @app.route('/jobs/<int:job_id>/delete',
            methods=['GET', 'POST'])
 def deleteJob(job_id):
     jobToDelete = session.query(Job).filter_by(id=job_id).one()
-
     if request.method == 'POST':
         session.delete(jobToDelete)
         session.commit()
@@ -228,8 +219,19 @@ def deleteJob(job_id):
 @app.route('/JSON')
 def ffJSON():
     jobs = session.query(Job).all()
-  
     return jsonify(ffItems=[i.serialize for i in jobs])
+
+@app.route('/jobs/<int:job_id>/ability/JSON')
+def ffAbilityJSON(job_id):
+    job = session.query(Job).filter_by(id=job_id).one()
+    items = session.query(Ability).filter_by(
+        job_id=job_id).all()
+    return jsonify(ffItems=[i.serialize for i in items])
+
+@app.route('/jobs/<int:job_id>/ability/<int:ability_id>/JSON')
+def abilityJSON(job_id, ability_id):
+    ability = session.query(Ability).filter_by(id=ability_id).one()
+    return jsonify(Ability=ability.serialize)
 
 @app.route('/jobs/<int:job_id>/<int:ability_id>/edit',
            methods=['GET', 'POST'])
@@ -250,7 +252,6 @@ def editAbility(job_id, ability_id):
 
 @app.route('/jobs/<int:job_id>/new', methods=['GET', 'POST'])
 def newAbility(job_id):
-
     if request.method == 'POST':
         newAbility = Ability(name=request.form['name'], description=request.form[
                            'description'], level=request.form['level'], Cast=request.form['Cast'], job_id=job_id)
@@ -259,7 +260,6 @@ def newAbility(job_id):
         return redirect('/')
     else:
         return render_template('new.html', job_id=job_id)
-
 
 if __name__ == '__main__':
     app.secret_key = 'ia1yTpinkCIgnkt_H8bHqswe'
