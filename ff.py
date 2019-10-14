@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import (Flask, render_template, request,
+                   redirect, jsonify, url_for, flash)
 
 from flask import session as login_session
 import random
@@ -84,7 +85,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('Current user is already'
+                                            'connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -107,7 +109,7 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px;height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -118,13 +120,15 @@ def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps('Current'
+                                            'user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     print 'In gdisconnect access token is %s', access_token
     print 'User name is: '
     print login_session['username']
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = ('https://accounts.google.com/o/oauth2/revoke?token=%s'
+           % login_session['access_token'])
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -139,7 +143,8 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps('Failed'
+                                 'to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -219,12 +224,16 @@ def test3():
            methods=['GET', 'POST'])
 def deleteJob(job_id):
     jobToDelete = session.query(Job).filter_by(id=job_id).one()
-    if request.method == 'POST':
-        session.delete(jobToDelete)
-        session.commit()
-        return redirect('/')
+    print jobToDelete.author
+    if jobToDelete.author == login_session['username']:
+        if request.method == 'POST':
+            session.delete(jobToDelete)
+            session.commit()
+            return redirect('/')
+        else:
+            return render_template('delete.html', item=jobToDelete)
     else:
-        return render_template('delete.html', item=jobToDelete)
+        return render_template('error.html')
 
 
 @app.route('/JSON')
@@ -252,27 +261,39 @@ def abilityJSON(job_id, ability_id):
 def editAbility(job_id, ability_id):
     if 'username' not in login_session:
         return redirect('/login')
+    access_token = login_session.get('access_token')
     editedAbility = session.query(Ability).filter_by(id=ability_id).one()
-    if request.method == 'POST':
-        if request.form['name']:
-            editedAbility.name = request.form['name']
-            editedAbility.level = request.form['level']
-            editedAbility.description = request.form['description']
-        session.add(editedAbility)
-        session.commit()
-        return redirect('/')
+    if editedAbility.author == login_session['username']:
+        if request.method == 'POST':
+            if request.form['name']:
+                editedAbility.name = request.form['name']
+                editedAbility.level = request.form['level']
+                editedAbility.description = request.form['description']
+            session.add(editedAbility)
+            session.commit()
+            return redirect('/')
+        else:
+            return render_template('edit.html', job_id=job_id,
+                                   ability_id=ability_id, item=editedAbility)
     else:
-        return render_template(
-            'edit.html', job_id=job_id, ability_id=ability_id, item=editedAbility)
+        return render_template('error.html')
 
 
 @app.route('/jobs/<int:job_id>/new', methods=['GET', 'POST'])
 def newAbility(job_id):
+    if 'username' not in login_session:
+        return redirect('/login')
+    access_token = login_session.get('access_token')
     if request.method == 'POST':
-        newAbility = Ability(name=request.form['name'], description=request.form[
-                           'description'], level=request.form['level'], Cast=request.form['Cast'], job_id=job_id)
+        newAbility = Ability(name=request.form['name'],
+                             description=request.form['description'],
+                             level=request.form['level'],
+                             Cast=request.form['Cast'],
+                             author=login_session['username'],
+                             job_id=job_id)
         session.add(newAbility)
         session.commit()
+        print login_session['username']
         return redirect('/')
     else:
         return render_template('new.html', job_id=job_id)

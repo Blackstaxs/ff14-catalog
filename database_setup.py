@@ -16,6 +16,7 @@ class Job(Base):
     role = Column(String(10), nullable=False)
     description = Column(String(250))
     img = Column(String(250))
+    author = Column(String(80), nullable=False)
 
     @property
     def serialize(self):
@@ -35,6 +36,7 @@ class Ability(Base):
     level = Column(Integer)
     job_id = Column(Integer, ForeignKey('job.id'))
     job = relationship(Job)
+    author = Column(String(80), nullable=False)
 
     @property
     def serialize(self):
